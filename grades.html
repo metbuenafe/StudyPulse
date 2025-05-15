@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <link rel="shortcut icon" href="./images/logo.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+    :root {
+    --color-primary: #7380ec;
+    --color-danger: #ff7782;
+    --color-success: #41f1b6;
+    --color-warning: #ffbb55;
+    --color-white: #fff;
+    --color-info: #7d8da1;
+    --color-dark: #363949;
+    --color-light: rgba(132, 139, 200, 0.18);
+    --color-dark-varient: #677483;
+    --color-background: #f6f6f9;
+    --box-shadow: 0 2rem 3rem var(--color-light);
+    --card-border-radius: 2rem;
+    --border-radius-1: 0.4rem;
+    --border-radius-2: 1.2rem;
+    --card-padding: 1.8rem;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    background-color: var(--color-background);
+    min-height: 100vh;
+    color: var(--color-dark);
+}
+.main-content {
+    flex: 1;
+    padding: 150px;
+    background-color: var(--color-white);
+    margin-left: 250px;
+}
+
+.container {
+    background: var(--color-white);
+    padding: 20px;
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.course-entry, .saved-course {
+    margin-bottom: 10px;
+    padding: 15px;
+    background: var(--color-light);
+    border-radius: var(--border-radius-2);
+    transition: all 0.3s ease;
+}
+
+.course-entry:hover, .saved-course:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow);
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    cursor: pointer;
+    border-radius: var(--border-radius-1);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #357abd;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.remove-btn {
+    background: var(--color-danger);
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+.update-btn {
+    background: var(--color-success);
+}
+
+.update-btn:hover {
+    background: #218838;
+}
+
+input {
+    padding: 8px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: var(--border-radius-1);
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+    </style>
+
+
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="./images/logo.png" alt="">
+            <h2>Study<span class="danger">Pulse</span></h2>
+        </div>
+        <div class="navbar">
+            <a href="dashboard.html">
+                <span class="material-icons-sharp">home</span>
+                <h3>Home</h3>
+            </a>
+            <a href="timetable.html" onclick="timeTableAll()">
+                <span class="material-icons-sharp">today</span>
+                <h3>Class</h3>
+            </a> 
+            <a href="grades.html">
+                <span class="material-icons-sharp">grid_view</span>
+                <h3>Courses</h3>
+            </a>
+            <a href="password.html" class="active">
+                <span class="material-icons-sharp">settings</span>
+                <h3>Settings</h3>
+            </a>
+            <a href="#">
+                <span class="material-icons-sharp">logout</span>
+                <h3>Logout</h3>
+            </a>
+        </div>
+        <div id="profile-btn" style="display: none;">
+            <span class="material-icons-sharp">person</span>
+        </div>
+        <div class="theme-toggler">
+            <span class="material-icons-sharp active">light_mode</span>
+            <span class="material-icons-sharp">dark_mode</span>
+        </div>
+    </header>
+    <div class="main-content">
+        <div class="container">
+            <h2>Course Selection and Grades</h2>
+            <button onclick="addCourse()">Add Course</button>
+            <div id="course-list"></div>
+            <button onclick="saveCourses()">Save Courses</button>
+        </div>
+        <div class="container" id="saved-courses-container" style="margin-top: 20px; display: none;">
+            <h2>Saved Courses</h2>
+            <div id="saved-courses"></div>
+        </div>
+    </div>
+    <script>
+    function addCourse() {
+        let courseContainer = document.getElementById("course-list");
+        let courseEntry = document.createElement("div");
+        courseEntry.classList.add("course-entry");
+        courseEntry.innerHTML = `
+            <input type="text" placeholder="Course Name" required>
+            <input type="number" placeholder="Prelim Grade" min="0" max="100" required>
+            <input type="number" placeholder="Midterm Grade" min="0" max="100" required>
+            <input type="number" placeholder="Final Grade" min="0" max="100" required>
+            <button class="remove-btn" onclick="removeCourse(this)">Remove</button>
+        `;
+        courseContainer.appendChild(courseEntry);
+    }
+
+    function removeCourse(button) {
+        button.parentElement.remove();
+    }
+
+    function saveCourses() {
+        let courses = [];
+        document.querySelectorAll(".course-entry").forEach(entry => {
+            let inputs = entry.getElementsByTagName("input");
+            let course = {
+                name: inputs[0].value,
+                prelim: inputs[1].value,
+                midterm: inputs[2].value,
+                final: inputs[3].value
+            };
+            courses.push(course);
+        });
+        localStorage.setItem("courses", JSON.stringify(courses));
+        displaySavedCourses();
+        alert("Courses saved successfully!");
+    }
+
+    function displaySavedCourses() {
+        let savedCoursesContainer = document.getElementById("saved-courses-container");
+        let savedCoursesDiv = document.getElementById("saved-courses");
+        savedCoursesDiv.innerHTML = "";
+        
+        let courses = JSON.parse(localStorage.getItem("courses")) || [];
+        courses.forEach((course, index) => {
+            let courseDiv = document.createElement("div");
+            courseDiv.classList.add("saved-course");
+            courseDiv.innerHTML = `
+                <input type="text" value="${course.name}" onchange="updateCourse(${index}, 'name', this.value)">
+                <input type="number" value="${course.prelim}" min="0" max="100" onchange="updateCourse(${index}, 'prelim', this.value)">
+                <input type="number" value="${course.midterm}" min="0" max="100" onchange="updateCourse(${index}, 'midterm', this.value)">
+                <input type="number" value="${course.final}" min="0" max="100" onchange="updateCourse(${index}, 'final', this.value)">
+                <button class="update-btn" onclick="saveUpdatedCourses()">Update</button>
+                <button class="remove-btn" onclick="deleteCourse(${index})">Remove</button>
+            `;
+            savedCoursesDiv.appendChild(courseDiv);
+        });
+        savedCoursesContainer.style.display = courses.length > 0 ? "block" : "none";
+    }
+
+    function deleteCourse(index) {
+        let courses = JSON.parse(localStorage.getItem("courses")) || [];
+        courses.splice(index, 1);
+        localStorage.setItem("courses", JSON.stringify(courses));
+        displaySavedCourses();
+    }
+
+    function updateCourse(index, field, value) {
+        let courses = JSON.parse(localStorage.getItem("courses")) || [];
+        courses[index][field] = value;
+        localStorage.setItem("courses", JSON.stringify(courses));
+    }
+
+    function saveUpdatedCourses() {
+        let courses = [];
+        document.querySelectorAll(".saved-course").forEach(entry => {
+            let inputs = entry.getElementsByTagName("input");
+            let course = {
+                name: inputs[0].value,
+                prelim: inputs[1].value,
+                midterm: inputs[2].value,
+                final: inputs[3].value
+            };
+            courses.push(course);
+        });
+        localStorage.setItem("courses", JSON.stringify(courses));
+        displaySavedCourses();
+        alert("Courses updated successfully!");
+    }
+
+    // Display saved courses on page load
+    window.onload = displaySavedCourses;
+    function saveCourses() {
+    let courses = [];
+        document.querySelectorAll(".course-entry").forEach(entry => {
+            let inputs = entry.getElementsByTagName("input");
+            let prelim = parseFloat(inputs[1].value) || 0;
+            let midterm = parseFloat(inputs[2].value) || 0;
+            let final = parseFloat(inputs[3].value) || 0;
+            let percentage = Math.round((prelim + midterm + final) / 3);
+        
+            let course = {
+            name: inputs[0].value,
+            prelim,
+            midterm,
+            final,
+            percentage
+        };
+        courses.push(course);
+    });
+        localStorage.setItem("courses", JSON.stringify(courses));
+        displaySavedCourses();
+        alert("Courses saved successfully!");
+}
+let percentage = Math.round((prelim + midterm + final) / 3);
+let courses = JSON.parse(localStorage.getItem("courses")) || [];
+
+courses.push({
+    name: courseName,
+    prelim: prelim,
+    midterm: midterm,
+    final: final,
+    percentage: percentage
+});
+
+localStorage.setItem("courses", JSON.stringify(courses));
+
+
+</script>
+
+</body>
+
+<script src="app.js"></script>
+
+</html>

@@ -1,0 +1,173 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.html"); // Redirect to login page if not logged in
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="shortcut icon" href="./images/logo.png">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo" title="StudyPulse">
+            <img src="./images/logo.png" alt="">
+            <h2>Study<span class="danger">Pulse</span></h2>
+        </div>
+        <div class="navbar">
+            <a href="dashboard.html" class="active">
+                <span class="material-icons-sharp">home</span>
+                <h3>Home</h3>
+            </a>
+            <a href="timetable.html" onclick="timeTableAll()">
+                <span class="material-icons-sharp">today</span>
+                <h3>Class</h3>
+            </a> 
+            <a href="grades.html">
+                <span class="material-icons-sharp">grid_view</span>
+                <h3>Courses</h3>
+            </a>
+            <a href="password.html">
+                <span class="material-icons-sharp">settings</span>
+                <h3>Settings</h3>
+            </a>
+            <a href="#">
+                <span class="material-icons-sharp" onclick="">logout</span>
+                <h3>Logout</h3>
+            </a>
+        </div>
+        <div id="profile-btn">
+            <span class="material-icons-sharp">person</span>
+        </div>
+        <div class="theme-toggler">
+            <span class="material-icons-sharp active">light_mode</span>
+            <span class="material-icons-sharp">dark_mode</span>
+        </div>
+        
+    </header>
+    <div class="container">
+        <aside>
+            <div class="profile">
+                <div class="top">
+                    <div class="profile-photo">
+                        <img src="./images/profile-1.jpg" alt="">
+                    </div>
+                    <div class="info">
+                        <p>Name</p>
+                        <small class="text-muted">12102030</small>
+                    </div>
+                </div>
+                <div class="about">
+                    <h5>Course</h5>
+                    <p></p>
+                    <h5>Date Of Birth</h5>
+                    <p>29-Feb-2020</p>
+                    <h5>Contact</h5>
+                    <p>1234567890</p>
+                    <h5>Email</h5>
+                    <p>unknown@gmail.com</p>
+                    <h5>Address</h5>
+                    <p>dsad</p>
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <h1>Grades</h1>
+            <div class="subjects" id="dynamic-grades">
+                
+            </div>
+
+            <div class="timetable" id="timetable">
+                <div>
+                    <span id="prevDay">&lt;</span>
+                    <h2>Today's Timetable</h2>
+                    <span id="nextDay">&gt;</span>
+                </div>
+                <span class="closeBtn" onclick="timeTableAll()">X</span>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Room No.</th>
+                            <th>Subject</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="Subjects" class="subjects"></div>
+
+                 
+            </main>
+
+        <div class="right">
+            <div class="calendar">
+                <h2 class="calendar-date">May 1, 2025</h2>
+            
+                <div class="calendar-entry">
+                    <div class="date-icon">📅</div>
+                    <div class="details">
+                        <h3>Labor Day (PH)</h3>
+                        <small class="text-muted">Public Holiday</small>
+                    </div>
+                </div>
+            
+            
+
+        </div>
+    </div>
+
+    <script src="timeTable.js"></script>
+    <script src="app.js"></script>
+    <script>
+    window.onload = loadSubjects;
+    </script>
+    <script>
+    window.onload = function() {
+    let courses = JSON.parse(localStorage.getItem("courses")) || [];
+    let container = document.getElementById("dynamic-grades");
+
+    courses.forEach(course => {
+        let div = document.createElement("div");
+        div.className = "grade-card";
+        div.innerHTML = `
+            <h3><span class="material-icons-sharp">school</span>
+            ${course.name}</h3>
+            <p>${course.prelim} / ${course.midterm} / ${course.final}</p>
+            <div class="progress" style="--percentage:${course.percentage}">
+                <svg><circle cx="38" cy="38" r="36"></circle></svg>
+                <div class="number"><p>${course.percentage}%</p></div>
+            </div>
+            <small>Updated</small>
+        `;
+        container.appendChild(div);
+    });
+};
+</script>
+<script>
+  const firstName = localStorage.getItem('user_firstname') || 'First';
+  const lastName = localStorage.getItem('user_lastname') || 'Last';
+  const email = localStorage.getItem('user_email') || 'unknown@gmail.com';
+
+  // Set profile name
+  document.querySelector('.profile .info p').textContent = `${firstName} ${lastName}`;
+
+  // Set profile email (ensure it's the correct <p> tag in your .about section)
+  const aboutSection = document.querySelector('.profile .about');
+  const allParagraphs = aboutSection.querySelectorAll('p');
+  allParagraphs[3].textContent = email; // 4th <p> under "about" section is email
+</script>
+
+<script>src="script2.js"</script>
+</body>
+</html>
