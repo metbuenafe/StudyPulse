@@ -16,6 +16,124 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="shortcut icon" href="./images/logo.png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Add these styles to your existing style.css or here */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .settings-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .settings-header h2 {
+            color: var(--color-primary);
+        }
+        
+        .close-settings {
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        
+        .settings-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .profile-photo-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            grid-column: span 2;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 3px solid var(--color-primary);
+        }
+        
+        .photo-upload-btn {
+            padding: 0.5rem 1rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .save-btn {
+            grid-column: span 2;
+            padding: 0.8rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+        
+        .photo-url-input {
+            width: 100%;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -36,12 +154,12 @@ if (!isset($_SESSION['user_id'])) {
                 <span class="material-icons-sharp">grid_view</span>
                 <h3>Courses</h3>
             </a>
-            <a href="password.html">
+            <a href="#" id="openSettings">
                 <span class="material-icons-sharp">settings</span>
                 <h3>Settings</h3>
             </a>
-            <a href="#">
-                <span class="material-icons-sharp" onclick="">logout</span>
+            <a href="logout.php" id="logout-link">
+                <span class="material-icons-sharp">logout</span>
                 <h3>Logout</h3>
             </a>
         </div>
@@ -52,31 +170,93 @@ if (!isset($_SESSION['user_id'])) {
             <span class="material-icons-sharp active">light_mode</span>
             <span class="material-icons-sharp">dark_mode</span>
         </div>
-        
     </header>
+
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2>Profile Settings</h2>
+                <span class="material-icons-sharp close-settings" id="closeSettings">close</span>
+            </div>
+            <form class="settings-form" id="profileForm">
+                <div class="profile-photo-upload">
+                    <img id="profilePreview" src="./images/profile-1.jpg" alt="Profile Photo" class="profile-preview">
+                    <input type="file" id="photoUpload" accept="image/*" style="display: none;">
+                    <button type="button" class="photo-upload-btn" onclick="document.getElementById('photoUpload').click()">Upload Photo</button>
+                    <input type="text" id="photoUrl" class="photo-url-input" placeholder="Or enter image URL">
+                </div>
+                
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact">Contact Number</label>
+                    <input type="tel" id="contact">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="course">Course</label>
+                    <select id="course">
+                        <option value="">Select Course</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Business">Business</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="address">Address</label>
+                    <input type="text" id="address">
+                </div>
+                
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <div class="container">
         <aside>
             <div class="profile">
                 <div class="top">
                     <div class="profile-photo">
-                        <img src="./images/profile-1.jpg" alt="">
+                        <img id="currentProfilePhoto" src="./images/profile-1.jpg" alt="">
                     </div>
                     <div class="info">
-                        <p>Name</p>
+                        <p id="profileName">Name</p>
                         <small class="text-muted">12102030</small>
                     </div>
                 </div>
                 <div class="about">
                     <h5>Course</h5>
-                    <p></p>
+                    <p id="profileCourse"></p>
                     <h5>Date Of Birth</h5>
-                    <p>29-Feb-2020</p>
+                    <p id="profileDob">29-Feb-2020</p>
                     <h5>Contact</h5>
-                    <p>1234567890</p>
+                    <p id="profileContact">1234567890</p>
                     <h5>Email</h5>
-                    <p>unknown@gmail.com</p>
+                    <p id="profileEmail">unknown@gmail.com</p>
                     <h5>Address</h5>
-                    <p>dsad</p>
+                    <p id="profileAddress">dsad</p>
                 </div>
             </div>
         </aside>
@@ -84,7 +264,7 @@ if (!isset($_SESSION['user_id'])) {
         <main>
             <h1>Grades</h1>
             <div class="subjects" id="dynamic-grades">
-                
+                <!-- Dynamic content will be inserted here by JavaScript -->
             </div>
 
             <div class="timetable" id="timetable">
@@ -106,14 +286,12 @@ if (!isset($_SESSION['user_id'])) {
                     <tbody></tbody>
                 </table>
                 <div id="Subjects" class="subjects"></div>
-
-                 
-            </main>
+            </div>
+        </main>
 
         <div class="right">
             <div class="calendar">
                 <h2 class="calendar-date">May 1, 2025</h2>
-            
                 <div class="calendar-entry">
                     <div class="date-icon">📅</div>
                     <div class="details">
@@ -121,53 +299,143 @@ if (!isset($_SESSION['user_id'])) {
                         <small class="text-muted">Public Holiday</small>
                     </div>
                 </div>
-            
-            
-
+            </div>
         </div>
     </div>
 
     <script src="timeTable.js"></script>
     <script src="app.js"></script>
     <script>
-    window.onload = loadSubjects;
-    </script>
-    <script>
     window.onload = function() {
-    let courses = JSON.parse(localStorage.getItem("courses")) || [];
-    let container = document.getElementById("dynamic-grades");
+        loadSubjects();
+        
+        let courses = JSON.parse(localStorage.getItem("courses")) || [];
+        let container = document.getElementById("dynamic-grades");
 
-    courses.forEach(course => {
-        let div = document.createElement("div");
-        div.className = "grade-card";
-        div.innerHTML = `
-            <h3><span class="material-icons-sharp">school</span>
-            ${course.name}</h3>
-            <p>${course.prelim} / ${course.midterm} / ${course.final}</p>
-            <div class="progress" style="--percentage:${course.percentage}">
-                <svg><circle cx="38" cy="38" r="36"></circle></svg>
-                <div class="number"><p>${course.percentage}%</p></div>
-            </div>
-            <small>Updated</small>
-        `;
-        container.appendChild(div);
+        courses.forEach(course => {
+            let div = document.createElement("div");
+            div.className = "grade-card";
+            div.innerHTML = `
+                <h3><span class="material-icons-sharp">school</span>
+                ${course.name}</h3>
+                <p>${course.prelim} / ${course.midterm} / ${course.final}</p>
+                <div class="progress" style="--percentage:${course.percentage}">
+                    <svg><circle cx="38" cy="38" r="36"></circle></svg>
+                    <div class="number"><p>${course.percentage}%</p></div>
+                </div>
+                <small>Updated</small>
+            `;
+            container.appendChild(div);
+        });
+
+        // Load profile data
+        loadProfileData();
+    };
+
+    function loadProfileData() {
+        const firstName = localStorage.getItem('user_firstname') || 'First';
+        const lastName = localStorage.getItem('user_lastname') || 'Last';
+        const email = localStorage.getItem('user_email') || 'unknown@gmail.com';
+        const dob = localStorage.getItem('user_dob') || '29-Feb-2020';
+        const contact = localStorage.getItem('user_contact') || '1234567890';
+        const course = localStorage.getItem('user_course') || '';
+        const address = localStorage.getItem('user_address') || 'dsad';
+        const profilePhoto = localStorage.getItem('user_profile_photo') || './images/profile-1.jpg';
+
+        // Set profile data in sidebar
+        document.getElementById('profileName').textContent = `${firstName} ${lastName}`;
+        document.getElementById('profileEmail').textContent = email;
+        document.getElementById('profileDob').textContent = dob;
+        document.getElementById('profileContact').textContent = contact;
+        document.getElementById('profileCourse').textContent = course;
+        document.getElementById('profileAddress').textContent = address;
+        document.getElementById('currentProfilePhoto').src = profilePhoto;
+
+        // Set form data in settings modal
+        document.getElementById('firstName').value = firstName;
+        document.getElementById('lastName').value = lastName;
+        document.getElementById('email').value = email;
+        document.getElementById('dob').value = dob;
+        document.getElementById('contact').value = contact;
+        document.getElementById('course').value = course;
+        document.getElementById('address').value = address;
+        document.getElementById('profilePreview').src = profilePhoto;
+    }
+
+    // Settings modal functionality
+    document.getElementById('openSettings').addEventListener('click', function() {
+        document.getElementById('settingsModal').style.display = 'flex';
     });
-};
-</script>
-<script>
-  const firstName = localStorage.getItem('user_firstname') || 'First';
-  const lastName = localStorage.getItem('user_lastname') || 'Last';
-  const email = localStorage.getItem('user_email') || 'unknown@gmail.com';
 
-  // Set profile name
-  document.querySelector('.profile .info p').textContent = `${firstName} ${lastName}`;
+    document.getElementById('closeSettings').addEventListener('click', function() {
+        document.getElementById('settingsModal').style.display = 'none';
+    });
 
-  // Set profile email (ensure it's the correct <p> tag in your .about section)
-  const aboutSection = document.querySelector('.profile .about');
-  const allParagraphs = aboutSection.querySelectorAll('p');
-  allParagraphs[3].textContent = email; // 4th <p> under "about" section is email
-</script>
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('settingsModal')) {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+    });
 
-<script>src="script2.js"</script>
+    // Handle photo upload
+    document.getElementById('photoUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('profilePreview').src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Handle photo URL input
+    document.getElementById('photoUrl').addEventListener('change', function() {
+        const url = this.value.trim();
+        if (url) {
+            document.getElementById('profilePreview').src = url;
+        }
+    });
+
+    // Save profile data
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const email = document.getElementById('email').value;
+        const dob = document.getElementById('dob').value;
+        const contact = document.getElementById('contact').value;
+        const course = document.getElementById('course').value;
+        const address = document.getElementById('address').value;
+        const profilePhoto = document.getElementById('profilePreview').src;
+        
+        // Save to localStorage
+        localStorage.setItem('user_firstname', firstName);
+        localStorage.setItem('user_lastname', lastName);
+        localStorage.setItem('user_email', email);
+        localStorage.setItem('user_dob', dob);
+        localStorage.setItem('user_contact', contact);
+        localStorage.setItem('user_course', course);
+        localStorage.setItem('user_address', address);
+        localStorage.setItem('user_profile_photo', profilePhoto);
+        
+        // Update profile display
+        loadProfileData();
+        
+        // Close modal
+        document.getElementById('settingsModal').style.display = 'none';
+        
+        alert('Profile updated successfully!');
+    });
+
+    // Optional: Add confirmation dialog for logout
+    document.getElementById('logout-link').addEventListener('click', function(e) {
+        if(!confirm('Are you sure you want to logout?')) {
+            e.preventDefault();
+        }
+    });
+    </script>
 </body>
 </html>
