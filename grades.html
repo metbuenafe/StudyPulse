@@ -136,14 +136,14 @@ input:focus {
                 <span class="material-icons-sharp">grid_view</span>
                 <h3>Courses</h3>
             </a>
-            <a href="settings.html" class="active">
+            <a href="password.html" class="active">
                 <span class="material-icons-sharp">settings</span>
                 <h3>Settings</h3>
-            </a>
-            <a href="#">
+            </a>    
+            <<a href="logout.php">
                 <span class="material-icons-sharp">logout</span>
                 <h3>Logout</h3>
-            </a>
+           </a>
         </div>
         <div id="profile-btn" style="display: none;">
             <span class="material-icons-sharp">person</span>
@@ -205,7 +205,7 @@ input:focus {
         let savedCoursesContainer = document.getElementById("saved-courses-container");
         let savedCoursesDiv = document.getElementById("saved-courses");
         savedCoursesDiv.innerHTML = "";
-        
+
         let courses = JSON.parse(localStorage.getItem("courses")) || [];
         courses.forEach((course, index) => {
             let courseDiv = document.createElement("div");
@@ -263,7 +263,7 @@ input:focus {
             let midterm = parseFloat(inputs[2].value) || 0;
             let final = parseFloat(inputs[3].value) || 0;
             let percentage = Math.round((prelim + midterm + final) / 3);
-        
+
             let course = {
             name: inputs[0].value,
             prelim,
